@@ -26,7 +26,8 @@ namespace CS_UrlRedirect.Controllers
         {
             var model = new IndexViewModel
             {
-                redirects = await _context.Redirects.ToListAsync()
+                redirects = await _context.Redirects.ToListAsync(),
+                redirect = new RedirectViewModel()
             };
             if (id.HasValue)
             {
@@ -65,48 +66,47 @@ namespace CS_UrlRedirect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(int id, [Bind("Id,ShortCode,Url,NumVisits")] RedirectViewModel redirect)
+        public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,action")] RedirectViewModel redirectVM)
         {
-            if (string.IsNullOrWhiteSpace(redirect.ShortCode))
+            if (string.IsNullOrWhiteSpace(redirectVM.ShortCode))
             {
-                ModelState.AddModelError(nameof(redirect.ShortCode), "A short code is required");
+                ModelState.AddModelError(nameof(redirectVM.ShortCode), "A short code is required");
             } else
             {
-                redirect.ShortCode = redirect.ShortCode.Trim();
-                if (RedirectExists(redirect.ShortCode))
+                redirectVM.ShortCode = redirectVM.ShortCode.Trim();
+                if (redirectVM.action == RedirectViewModel.Action.Create && RedirectExists(redirectVM.ShortCode))
                 {
-                    ModelState.AddModelError(nameof(redirect.ShortCode), "The following short code is unavailable");
+                    ModelState.AddModelError(nameof(redirectVM.ShortCode), "The following short code is unavailable");
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(redirect.Url))
+            if (string.IsNullOrWhiteSpace(redirectVM.Url))
             {
-                ModelState.AddModelError(nameof(redirect.Url), "A redirect url is required");
+                ModelState.AddModelError(nameof(redirectVM.Url), "A redirect url is required");
             } else
             {
-                redirect.Url = redirect.Url.Trim();
+                redirectVM.Url = redirectVM.Url.Trim();
+                if (!Http.IsValidURL(redirectVM.Url))
+                {
+                    ModelState.AddModelError(nameof(redirectVM.Url), "A valid destination url is required");
+                }
             }
 
             if (ModelState.IsValid)
             {
-                switch (redirect.action)
+                switch (redirectVM.action)
                 {
                     case RedirectViewModel.Action.Create:
-                        await CreateEntry(redirect);
+                        await CreateEntry(redirectVM);
                         break;
                     case RedirectViewModel.Action.Update:
-                        if (id != redirect.Id)
-                        {
-                            return NotFound();
-                        }
-
                         try
                         {
-                            await UpdateEntry(redirect);
+                            await UpdateEntry(redirectVM);
                         }
                         catch (DbUpdateConcurrencyException)
                         {
-                            if (RedirectExists(redirect.Id))
+                            if (RedirectExists(redirectVM.Id))
                             {
                                 throw;
                             }
@@ -115,19 +115,30 @@ namespace CS_UrlRedirect.Controllers
                         break;
                 }
                 return RedirectToAction(nameof(Index));
+            } else
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => new { x.Key, x.Value.Errors })
+                    .ToList();
+
+                Debug.Print("");
             }
-            return View();
+            return PartialView("_RedirectForm", redirectVM);
         }
 
-        public async Task CreateEntry(Redirect redirect)
+        public async Task CreateEntry(RedirectViewModel redirectVM)
         {
+            var redirect = new Redirect();
+            redirectVM.CopyPropsTo(ref redirect);
             _context.Add(redirect);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateEntry(Redirect redirect) 
+        public async Task UpdateEntry(RedirectViewModel redirectVM)
         {
-            _context.Update(redirect);
+            var redirect = GetRedirect(redirectVM.Id);
+            redirectVM.CopyPropsTo(ref redirect);
             await _context.SaveChangesAsync();
         }
 

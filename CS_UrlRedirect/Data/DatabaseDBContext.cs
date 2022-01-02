@@ -34,7 +34,7 @@ namespace CS_UrlRedirect.Data
 
                 entity.Property(e => e.ShortCode)
                     .IsRequired()
-                    .HasMaxLength(100)
+                    .HasMaxLength(50)
                     .HasColumnName("shortCode")
                     .IsFixedLength(true);
 
