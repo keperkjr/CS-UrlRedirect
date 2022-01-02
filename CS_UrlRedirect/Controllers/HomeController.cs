@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Utils;
 
 namespace CS_UrlRedirect.Controllers
 {
@@ -21,13 +22,25 @@ namespace CS_UrlRedirect.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        private async Task<IActionResult> ShowIndex(int? id = null)
         {
             var model = new IndexViewModel
             {
                 redirects = await _context.Redirects.ToListAsync()
             };
-            return View(model);
+            if (id.HasValue)
+            {
+                var redirect = GetRedirect(id.Value);
+                var redirectVM = new RedirectViewModel(RedirectViewModel.Action.Update);
+                redirect.CopyPropsTo(ref redirectVM);
+                model.redirect = redirectVM;
+            }
+            return View(nameof(Index), model);
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            return await ShowIndex();
         }
 
         public IActionResult Privacy()
@@ -41,6 +54,12 @@ namespace CS_UrlRedirect.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            return await ShowIndex(id);
+        }
+
         // POST: Redirects/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -48,27 +67,74 @@ namespace CS_UrlRedirect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,NumVisits")] RedirectViewModel redirect)
         {
+            redirect.ShortCode = redirect.ShortCode.Trim();
+            redirect.Url = redirect.Url.Trim();
+
             if (string.IsNullOrWhiteSpace(redirect.ShortCode))
             {
                 ModelState.AddModelError(nameof(redirect.ShortCode), "A short code is required");
+            } else if (RedirectExists(redirect.ShortCode))
+            {
+                ModelState.AddModelError(nameof(redirect.ShortCode), "The following short code is unavailable");
             }
             if (string.IsNullOrWhiteSpace(redirect.Url))
             {
-                ModelState.AddModelError(nameof(redirect.Url), "A url is required");
+                ModelState.AddModelError(nameof(redirect.Url), "A redirect url is required");
             }
 
             if (ModelState.IsValid)
             {
-                await AddEntry(redirect);
+                switch (redirect.action)
+                {
+                    case RedirectViewModel.Action.Create:
+                        await CreateEntry(redirect);
+                        break;
+                    case RedirectViewModel.Action.Update:
+                        try
+                        {
+                            await UpdateEntry(redirect);
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            if (RedirectExists(redirect.Id))
+                            {
+                                throw;
+
+                            }
+                            return NotFound();
+                        }
+                        break;
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View();
         }
 
-        public async Task AddEntry(Redirect redirect)
+        public async Task CreateEntry(Redirect redirect)
         {
             _context.Add(redirect);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateEntry(Redirect redirect) 
+        {
+            _context.Update(redirect);
+            await _context.SaveChangesAsync();
+        }
+
+        private bool RedirectExists(int id)
+        {
+            return GetRedirect(id) != null;
+        }
+
+        private bool RedirectExists(string shortCode)
+        {
+            return _context.Redirects.Any(e => e.ShortCode == shortCode);
+        }
+
+        private Redirect GetRedirect(int id)
+        {
+            return _context.Redirects.FirstOrDefault(e => e.Id == id);
         }
     }
 }

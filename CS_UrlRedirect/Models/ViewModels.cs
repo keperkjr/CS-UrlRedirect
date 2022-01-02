@@ -18,6 +18,8 @@ namespace CS_UrlRedirect.Models
             Create,
             Update
         }
-        public Action action = Action.Create;
+        public Action action;
+
+        public RedirectViewModel(Action action = Action.Create) {}
     }
 }
