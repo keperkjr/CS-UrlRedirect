@@ -1,6 +1,7 @@
 ﻿using CS_UrlRedirect.Data;
 using CS_UrlRedirect.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,13 @@ namespace CS_UrlRedirect.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var model = new IndexViewModel
+            {
+                redirects = await _context.Redirects.ToListAsync()
+            };
+            return View(model);
         }
 
         public IActionResult Privacy()
