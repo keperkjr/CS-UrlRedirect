@@ -1,3 +1,4 @@
+using CS_UrlRedirect.Data;
 using CS_UrlRedirect.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

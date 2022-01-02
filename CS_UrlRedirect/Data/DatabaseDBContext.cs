@@ -1,10 +1,11 @@
 ﻿using System;
+using CS_UrlRedirect.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace CS_UrlRedirect.Models
+namespace CS_UrlRedirect.Data
 {
     public partial class DatabaseDBContext : DbContext
     {
