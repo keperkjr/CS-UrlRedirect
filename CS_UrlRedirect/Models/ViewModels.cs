@@ -20,6 +20,13 @@ namespace CS_UrlRedirect.Models
         }
         public Action action;
 
-        public RedirectViewModel(Action action = Action.Create) {}
+        public RedirectViewModel()
+        {
+            this.action = Action.Create;
+        }
+
+        public RedirectViewModel(Action action) {
+            this.action = action;
+        }
     }
 }

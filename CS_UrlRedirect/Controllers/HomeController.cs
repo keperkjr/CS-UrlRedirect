@@ -67,19 +67,24 @@ namespace CS_UrlRedirect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,NumVisits")] RedirectViewModel redirect)
         {
-            redirect.ShortCode = redirect.ShortCode.Trim();
-            redirect.Url = redirect.Url.Trim();
-
             if (string.IsNullOrWhiteSpace(redirect.ShortCode))
             {
                 ModelState.AddModelError(nameof(redirect.ShortCode), "A short code is required");
-            } else if (RedirectExists(redirect.ShortCode))
+            } else
             {
-                ModelState.AddModelError(nameof(redirect.ShortCode), "The following short code is unavailable");
+                redirect.ShortCode = redirect.ShortCode.Trim();
+                if (RedirectExists(redirect.ShortCode))
+                {
+                    ModelState.AddModelError(nameof(redirect.ShortCode), "The following short code is unavailable");
+                }
             }
+
             if (string.IsNullOrWhiteSpace(redirect.Url))
             {
                 ModelState.AddModelError(nameof(redirect.Url), "A redirect url is required");
+            } else
+            {
+                redirect.Url = redirect.Url.Trim();
             }
 
             if (ModelState.IsValid)
@@ -99,7 +104,6 @@ namespace CS_UrlRedirect.Controllers
                             if (RedirectExists(redirect.Id))
                             {
                                 throw;
-
                             }
                             return NotFound();
                         }
