@@ -65,7 +65,7 @@ namespace CS_UrlRedirect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,NumVisits")] RedirectViewModel redirect)
+        public async Task<IActionResult> Index(int id, [Bind("Id,ShortCode,Url,NumVisits")] RedirectViewModel redirect)
         {
             if (string.IsNullOrWhiteSpace(redirect.ShortCode))
             {
@@ -95,6 +95,11 @@ namespace CS_UrlRedirect.Controllers
                         await CreateEntry(redirect);
                         break;
                     case RedirectViewModel.Action.Update:
+                        if (id != redirect.Id)
+                        {
+                            return NotFound();
+                        }
+
                         try
                         {
                             await UpdateEntry(redirect);

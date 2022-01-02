@@ -3,6 +3,7 @@ using CS_UrlRedirect.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ namespace CS_UrlRedirect
 
             services.AddDbContext<DatabaseDBContext>(options => options.UseSqlServer(connection));
 
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.AddControllersWithViews();
         }
 

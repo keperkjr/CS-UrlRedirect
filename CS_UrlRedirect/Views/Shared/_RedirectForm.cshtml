@@ -6,6 +6,7 @@
     <form asp-action="Index" data-ajax="true" data-ajax-mode="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input asp-for="action" type="hidden" />
+        <input asp-for="Id" type="hidden" />
         <div class="form-group">
             <label asp-for="ShortCode" class="control-label"></label>
             <input asp-for="ShortCode" class="form-control" autocomplete="off" />
