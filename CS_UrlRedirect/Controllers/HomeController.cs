@@ -84,7 +84,8 @@ namespace CS_UrlRedirect.Controllers
             if (string.IsNullOrWhiteSpace(redirectVM.Url))
             {
                 ModelState.AddModelError(nameof(redirectVM.Url), "A redirect url is required");
-            } else
+            } 
+            else
             {
                 redirectVM.Url = redirectVM.Url.Trim();
                 if (!Http.IsValidURL(redirectVM.Url))
@@ -116,7 +117,8 @@ namespace CS_UrlRedirect.Controllers
                         break;
                 }
                 return RedirectToAction(nameof(Index));
-            } else
+            } 
+            else
             {
                 var errors = ModelState
                     .Where(x => x.Value.Errors.Count > 0)
