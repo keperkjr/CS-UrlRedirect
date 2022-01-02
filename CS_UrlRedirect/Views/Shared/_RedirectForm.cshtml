@@ -1,27 +1,58 @@
 ﻿@model CS_UrlRedirect.Models.RedirectViewModel
+@*data-ajax-success="FormSuccess"*@
+@* data-ajax="true" data-ajax-mode="post"*@
+<form id="formPostRedirect" asp-action="Index">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="action" type="hidden" />
+    <input asp-for="Id" type="hidden" />
+    <div class="form-group">
+        <label asp-for="ShortCode" class="control-label"></label>
+        <input asp-for="ShortCode" class="form-control" autocomplete="off" />
+        <span asp-validation-for="ShortCode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Url" class="control-label"></label>
+        <input asp-for="Url" class="form-control" autocomplete="off" />
+        <span asp-validation-for="Url" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input id="btnPostRedirect" type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
 
+<script>
+    $(document).ready(function () {
+        $('#btnPostRedirect').on('click', function (e) {
+            e.preventDefault();
+            let $form = $('#formPostRedirect');
+            let url = $form.attr('action');
 
-<div class="col-md-4">
-    @*data-ajax-success="FormSuccess"*@
-    <form asp-action="Index" data-ajax="true" data-ajax-mode="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input asp-for="action" type="hidden" />
-        <input asp-for="Id" type="hidden" />
-        <div class="form-group">
-            <label asp-for="ShortCode" class="control-label"></label>
-            <input asp-for="ShortCode" class="form-control" autocomplete="off" />
-            <span asp-validation-for="ShortCode" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Url" class="control-label"></label>
-            <input asp-for="Url" class="form-control" autocomplete="off" />
-            <span asp-validation-for="Url" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-primary" />
-        </div>
-    </form>
-</div>
+            $.ajax({
+                method: 'POST',
+                url: url,
+                data: $form.serialize(),
+                success: function (result) {
+                    if (result.redirectTo) {
+                        // The operation was a success on the server as it returned
+                        // a JSON object with an url property pointing to the location
+                        // you would like to redirect to => now use the window.location.href
+                        // property to redirect the client to this location
+                        //alert('Redirecting');
+                        window.location.href = result.redirectTo;
+                    } else {
+                        // The server returned a partial view => let's refresh
+                        // the corresponding section of our DOM with it
+                        //alert('Reloading');
+                        $form.parent().html(result);
+                    }
+                },
+                error: function () {
+                    //alert('Error');
+                }
+            });
+        });
+    });
+</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -116,7 +116,8 @@ namespace CS_UrlRedirect.Controllers
                         }
                         break;
                 }
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
+                return Json(new { redirectTo = Url.Action(nameof(Index)) });
             } 
             else
             {
