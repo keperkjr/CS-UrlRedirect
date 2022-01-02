@@ -1,6 +1,8 @@
+using CS_UrlRedirect.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,9 +15,12 @@ namespace CS_UrlRedirect
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private string _contentRootPath = "";
+
+        public Startup(IConfiguration configuration, IHostEnvironment env)
         {
             Configuration = configuration;
+            _contentRootPath = env.ContentRootPath;
         }
 
         public IConfiguration Configuration { get; }
@@ -23,6 +28,14 @@ namespace CS_UrlRedirect
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string conn = Configuration.GetConnectionString("DefaultConnection");
+            if (conn.Contains("%CONTENTROOTPATH%"))
+            {
+                conn = conn.Replace("%CONTENTROOTPATH%", _contentRootPath);
+            }
+
+            services.AddDbContext<DatabaseDBContext>(options => options.UseSqlServer(conn));
+
             services.AddControllersWithViews();
         }
 
