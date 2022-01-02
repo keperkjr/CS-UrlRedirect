@@ -71,7 +71,8 @@ namespace CS_UrlRedirect.Controllers
             if (string.IsNullOrWhiteSpace(redirectVM.ShortCode))
             {
                 ModelState.AddModelError(nameof(redirectVM.ShortCode), "A short code is required");
-            } else
+            } 
+            else
             {
                 redirectVM.ShortCode = redirectVM.ShortCode.Trim();
                 if (redirectVM.action == RedirectViewModel.Action.Create && RedirectExists(redirectVM.ShortCode))
@@ -135,10 +136,12 @@ namespace CS_UrlRedirect.Controllers
             await _context.SaveChangesAsync();
         }
 
+        // https://docs.microsoft.com/en-us/ef/core/saving/disconnected-entities
         public async Task UpdateEntry(RedirectViewModel redirectVM)
         {
             var redirect = GetRedirect(redirectVM.Id);
-            redirectVM.CopyPropsTo(ref redirect);
+            //redirectVM.CopyPropsTo(ref redirect);
+            _context.Entry(redirect).CurrentValues.SetValues(redirectVM);
             await _context.SaveChangesAsync();
         }
 
