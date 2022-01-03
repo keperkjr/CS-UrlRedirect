@@ -8,9 +8,15 @@ namespace CS_UrlRedirect.Services
 {
     public interface IRedirectService
     {
-        Task<bool> RedirectExists(int id);
-        Task<bool> RedirectExists(string code);
+        Task<bool> RedirectExistsAsync(int id);
+        Task<bool> RedirectExistsAsync(string code);
+        Task<Redirect> GetRedirectAsync(int id);
+        Task<Redirect> GetRedirectAsync(string code);
+
         Task<bool> AddRedirectAsync(Redirect newItem);
+        Task<bool> UpdateRedirectAsync(int id, object newItem);
+        Task<bool> DeleteRedirectAsync(int id);
+
         Task<Redirect> VisitRedirectAsync(string code);
     }
 }

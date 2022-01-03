@@ -1,5 +1,6 @@
 ﻿using CS_UrlRedirect.Data;
 using CS_UrlRedirect.Models;
+using CS_UrlRedirect.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,10 +17,13 @@ namespace CS_UrlRedirect.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly DatabaseDBContext _context;
-        public HomeController(ILogger<HomeController> logger, DatabaseDBContext context)
+        private readonly IRedirectService _redirectService;
+
+        public HomeController(ILogger<HomeController> logger, DatabaseDBContext context, IRedirectService redirectService)
         {
             _logger = logger;
             _context = context;
+            _redirectService = redirectService;
         }
 
         private async Task<IActionResult> ShowIndex(int? id = null)
@@ -31,7 +35,7 @@ namespace CS_UrlRedirect.Controllers
             };
             if (id.HasValue)
             {
-                var redirect = GetRedirect(id.Value);
+                var redirect = await _redirectService.GetRedirectAsync(id.Value);
                 var redirectVM = new RedirectViewModel(RedirectViewModel.Action.Update);
                 redirect.CopyPropsTo(ref redirectVM);
                 model.redirect = redirectVM;
@@ -75,7 +79,7 @@ namespace CS_UrlRedirect.Controllers
             else
             {
                 redirectVM.ShortCode = redirectVM.ShortCode.Trim();
-                if (redirectVM.action == RedirectViewModel.Action.Create && RedirectExists(redirectVM.ShortCode))
+                if (redirectVM.action == RedirectViewModel.Action.Create && await _redirectService.RedirectExistsAsync(redirectVM.ShortCode))
                 {
                     ModelState.AddModelError(nameof(redirectVM.ShortCode), "The following short code is unavailable");
                 }
@@ -108,7 +112,7 @@ namespace CS_UrlRedirect.Controllers
                         }
                         catch (DbUpdateConcurrencyException)
                         {
-                            if (RedirectExists(redirectVM.Id))
+                            if (await _redirectService.RedirectExistsAsync(redirectVM.Id))
                             {
                                 throw;
                             }
@@ -135,32 +139,15 @@ namespace CS_UrlRedirect.Controllers
         {
             var redirect = new Redirect();
             redirectVM.CopyPropsTo(ref redirect);
-            _context.Add(redirect);
-            await _context.SaveChangesAsync();
+            await _redirectService.AddRedirectAsync(redirect);
         }
 
         // https://docs.microsoft.com/en-us/ef/core/saving/disconnected-entities
         public async Task UpdateEntry(RedirectViewModel redirectVM)
         {
-            var redirect = GetRedirect(redirectVM.Id);
+            //var redirect = await _redirectService.GetRedirectAsync(redirectVM.Id);
             //redirectVM.CopyPropsTo(ref redirect);
-            _context.Entry(redirect).CurrentValues.SetValues(redirectVM);
-            await _context.SaveChangesAsync();
-        }
-
-        private bool RedirectExists(int id)
-        {
-            return GetRedirect(id) != null;
-        }
-
-        private bool RedirectExists(string shortCode)
-        {
-            return _context.Redirects.Any(e => e.ShortCode == shortCode);
-        }
-
-        private Redirect GetRedirect(int id)
-        {
-            return _context.Redirects.FirstOrDefault(e => e.Id == id);
+            await _redirectService.UpdateRedirectAsync(redirectVM.Id, redirectVM);
         }
 
         // POST: Redirects/Delete/5
@@ -168,9 +155,7 @@ namespace CS_UrlRedirect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var redirect = GetRedirect(id);
-            _context.Redirects.Remove(redirect);
-            await _context.SaveChangesAsync();
+            await _redirectService.DeleteRedirectAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -20,10 +20,10 @@ namespace CS_UrlRedirect.Controllers
         {
             _redirectService = redirectService;
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> DoRedirect(string id)
+        [HttpGet("{code}")]
+        public async Task<IActionResult> DoRedirect(string code)
         {
-            var redirect = await _redirectService.VisitRedirectAsync(id);
+            var redirect = await _redirectService.VisitRedirectAsync(code);
             return new RedirectResult(redirect.Url, false);
         }
     }
