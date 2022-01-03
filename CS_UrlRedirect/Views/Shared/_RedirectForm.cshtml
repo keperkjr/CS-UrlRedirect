@@ -21,7 +21,13 @@
         <span asp-validation-for="Url" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
+        @if (Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Update)
+        {
+            <input type="submit" name="actionType" value="Cancel" class="cancel btn btn-secondary" />
+        }
+
+        <input type="submit" name="actionType" value="@(Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Create ?
+                                                 "Add" : "Update")" class="btn btn-primary" />
     </div>
 </form>
 
