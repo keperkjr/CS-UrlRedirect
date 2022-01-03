@@ -5,7 +5,7 @@
 <form asp-action="Index"
       data-ajax="true" data-ajax-success="onSuccess" data-ajax-failure="onFailure"
       data-ajax-complete="onComplete"
-      data-ajax-url="/"
+      data-ajax-url="@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Index))"
     >
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="action" type="hidden" />
@@ -23,10 +23,11 @@
     <div class="form-group">
         @if (Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Update)
         {
-            <input type="submit" name="actionType" value="Cancel" class="cancel btn btn-secondary" />
+            <input type="submit" value="Cancel" formnovalidate class="cancel btn btn-secondary" 
+                onclick="@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Index))"       
+            />
         }
-
-        <input type="submit" name="actionType" value="@(Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Create ?
+        <input type="submit" value="@(Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Create ?
                                                  "Add" : "Update")" class="btn btn-primary" />
     </div>
 </form>

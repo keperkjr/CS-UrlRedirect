@@ -66,13 +66,8 @@ namespace CS_UrlRedirect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,action")] RedirectViewModel redirectVM, string actionType)
+        public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,action")] RedirectViewModel redirectVM)
         {
-            if (actionType == "Cancel")
-            {
-                return Json(new { redirectTo = Url.Action(nameof(Index)) });
-            }
-
             if (string.IsNullOrWhiteSpace(redirectVM.ShortCode))
             {
                 ModelState.AddModelError(nameof(redirectVM.ShortCode), "A short code is required");
