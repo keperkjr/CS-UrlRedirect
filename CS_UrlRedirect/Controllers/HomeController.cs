@@ -62,6 +62,10 @@ namespace CS_UrlRedirect.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
+            if (!await _redirectService.ExistsAsync(id))
+            {
+                return NotFound();
+            }
             return await ShowIndex(id);
         }
 

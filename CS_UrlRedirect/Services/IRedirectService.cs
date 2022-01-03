@@ -17,6 +17,6 @@ namespace CS_UrlRedirect.Services
         Task<bool> UpdateAsync(int id, object newItem);
         Task<bool> DeleteAsync(int id);
 
-        Task<Redirect> MarkVisitedAsync(string code);
+        Task<Redirect> MarkAsVisitedAsync(string code);
     }
 }

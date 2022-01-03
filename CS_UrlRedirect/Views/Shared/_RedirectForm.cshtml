@@ -23,12 +23,12 @@
     <div class="form-group">
         @if (Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Update)
         {
-            <input type="submit" value="Cancel" formnovalidate class="cancel btn btn-secondary" 
-                onclick="@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Index))"       
+            <input type="submit" value="❌ Cancel" formnovalidate class="cancel btn btn-secondary" 
+                onclick="location.href='@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Index))'"       
             />
         }
         <input type="submit" value="@(Model.action == CS_UrlRedirect.Models.RedirectViewModel.Action.Create ?
-                                                 "Add" : "Update")" class="btn btn-primary" />
+                                                 "➕ Add" : "💾 Update")" class="btn btn-primary" />
     </div>
 </form>
 

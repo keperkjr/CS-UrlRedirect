@@ -58,7 +58,7 @@ namespace CS_UrlRedirect.Services
             return saveResult == 1;
         }
 
-        public async Task<Redirect> VisitAsync(string code)
+        public async Task<Redirect> MarkAsVisitedAsync(string code)
         {
             var item = await GetAsync(code);
             if (item == null) return null;
