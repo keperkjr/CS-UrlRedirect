@@ -2,10 +2,10 @@
 @*
     data-ajax-confirm="Are you sure you want to do this?"
 *@
-<form asp-action="Index"
+<form asp-action="Create"
       data-ajax="true" data-ajax-success="onSuccess" data-ajax-failure="onFailure"
       data-ajax-complete="onComplete"
-      data-ajax-url="@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Index))"
+      data-ajax-url="@Url.Action(nameof(CS_UrlRedirect.Controllers.HomeController.Create))"
     >
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="action" type="hidden" />

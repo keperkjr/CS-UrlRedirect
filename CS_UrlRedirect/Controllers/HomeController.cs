@@ -43,23 +43,25 @@ namespace CS_UrlRedirect.Controllers
             return View(nameof(Index), model);
         }
 
+        // GET: /
         public async Task<IActionResult> Index()
         {
             return await ShowIndex();
         }
 
-        public IActionResult Privacy()
+        // GET: /mpn
+        [HttpGet("{code}")]
+        public async Task<IActionResult> DoRedirect(string code)
         {
-            return View();
+            var redirect = await _redirectService.MarkAsVisitedAsync(code);
+            if (redirect == null)
+            {
+                return NotFound();
+            }
+            return new RedirectResult(redirect.Url, false);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-
+        // GET: /Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             if (!await _redirectService.ExistsAsync(id))
@@ -69,12 +71,12 @@ namespace CS_UrlRedirect.Controllers
             return await ShowIndex(id);
         }
 
-        // POST: Redirects/Create
+        // POST: /Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([Bind("Id,ShortCode,Url,action")] RedirectViewModel redirectVM)
+        public async Task<IActionResult> Create([Bind("Id,ShortCode,Url,action")] RedirectViewModel redirectVM)
         {
             if (string.IsNullOrWhiteSpace(redirectVM.ShortCode))
             {
@@ -149,18 +151,29 @@ namespace CS_UrlRedirect.Controllers
         // https://docs.microsoft.com/en-us/ef/core/saving/disconnected-entities
         public async Task UpdateEntry(RedirectViewModel redirectVM)
         {
-            //var redirect = await _redirectService.GetAsync(redirectVM.Id);
-            //redirectVM.CopyPropsTo(ref redirect);
             await _redirectService.UpdateAsync(redirectVM.Id, redirectVM);
         }
 
-        // POST: Redirects/Delete/5
+        // POST: /Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _redirectService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /privacy
+        [Route("Privacy")]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
