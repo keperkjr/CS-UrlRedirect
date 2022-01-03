@@ -9,12 +9,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CS_UrlRedirect.Services
 {
-
-    /*
-                Task<URLRedirect[]> GetRedirectsForUserAsync(IdentityUser theUser);
-                Task<bool> AddRedirectAsync(TodoItem newItem);
-                Task<URLRedirect> VisitRedirectAsync(string id);
-    */
     public class RedirectService : IRedirectService
     {
         private readonly DatabaseDBContext _context;
@@ -22,51 +16,51 @@ namespace CS_UrlRedirect.Services
         {
             _context = context;
         }
-        public async Task<bool> RedirectExistsAsync(int Id)
+        public async Task<bool> ExistsAsync(int Id)
         {
             return await _context.Redirects.AnyAsync(e => e.Id == Id);
         }
 
-        public async Task<bool> RedirectExistsAsync(string shortCode)
+        public async Task<bool> ExistsAsync(string shortCode)
         {
             return await _context.Redirects.AnyAsync(e => e.ShortCode == shortCode);
         }
 
-        public async Task<Redirect> GetRedirectAsync(int id)
+        public async Task<Redirect> GetAsync(int id)
         {
             return await _context.Redirects.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Redirect> GetRedirectAsync(string code)
+        public async Task<Redirect> GetAsync(string code)
         {
             return await _context.Redirects.FirstOrDefaultAsync(e => e.ShortCode == code);
         }
 
-        public async Task<bool> AddRedirectAsync(Redirect newItem)
+        public async Task<bool> AddAsync(Redirect newItem)
         {
             _context.Redirects.Add(newItem);
             var saveResult = await _context.SaveChangesAsync();
             return saveResult == 1;
         }        
-        public async Task<bool> UpdateRedirectAsync(int id, object updateItem)
+        public async Task<bool> UpdateAsync(int id, object updateItem)
         {
-            var redirect = await GetRedirectAsync(id);
+            var redirect = await GetAsync(id);
             _context.Entry(redirect).CurrentValues.SetValues(updateItem);
             var saveResult = await _context.SaveChangesAsync();
             return saveResult == 1;
         }
 
-        public async Task<bool> DeleteRedirectAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var redirect = await GetRedirectAsync(id);
+            var redirect = await GetAsync(id);
             _context.Redirects.Remove(redirect);
             var saveResult = await _context.SaveChangesAsync();
             return saveResult == 1;
         }
 
-        public async Task<Redirect> VisitRedirectAsync(string code)
+        public async Task<Redirect> VisitAsync(string code)
         {
-            var item = await GetRedirectAsync(code);
+            var item = await GetAsync(code);
             if (item == null) return null;
             item.NumVisits++;
             var saveResult = await _context.SaveChangesAsync();

@@ -23,7 +23,7 @@ namespace CS_UrlRedirect.Controllers
         [HttpGet("{code}")]
         public async Task<IActionResult> DoRedirect(string code)
         {
-            var redirect = await _redirectService.VisitRedirectAsync(code);
+            var redirect = await _redirectService.MarkVisitedAsync(code);
             return new RedirectResult(redirect.Url, false);
         }
     }

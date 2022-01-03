@@ -35,7 +35,7 @@ namespace CS_UrlRedirect.Controllers
             };
             if (id.HasValue)
             {
-                var redirect = await _redirectService.GetRedirectAsync(id.Value);
+                var redirect = await _redirectService.GetAsync(id.Value);
                 var redirectVM = new RedirectViewModel(RedirectViewModel.Action.Update);
                 redirect.CopyPropsTo(ref redirectVM);
                 model.redirect = redirectVM;
@@ -79,9 +79,9 @@ namespace CS_UrlRedirect.Controllers
             else
             {
                 redirectVM.ShortCode = redirectVM.ShortCode.Trim();
-                if (redirectVM.action == RedirectViewModel.Action.Create && await _redirectService.RedirectExistsAsync(redirectVM.ShortCode))
+                if (redirectVM.action == RedirectViewModel.Action.Create && await _redirectService.ExistsAsync(redirectVM.ShortCode))
                 {
-                    ModelState.AddModelError(nameof(redirectVM.ShortCode), "The following short code is unavailable");
+                    ModelState.AddModelError(nameof(redirectVM.ShortCode), "The following short code is unavailable and cannot be used");
                 }
             }
 
@@ -112,7 +112,7 @@ namespace CS_UrlRedirect.Controllers
                         }
                         catch (DbUpdateConcurrencyException)
                         {
-                            if (await _redirectService.RedirectExistsAsync(redirectVM.Id))
+                            if (await _redirectService.ExistsAsync(redirectVM.Id))
                             {
                                 throw;
                             }
@@ -139,15 +139,15 @@ namespace CS_UrlRedirect.Controllers
         {
             var redirect = new Redirect();
             redirectVM.CopyPropsTo(ref redirect);
-            await _redirectService.AddRedirectAsync(redirect);
+            await _redirectService.AddAsync(redirect);
         }
 
         // https://docs.microsoft.com/en-us/ef/core/saving/disconnected-entities
         public async Task UpdateEntry(RedirectViewModel redirectVM)
         {
-            //var redirect = await _redirectService.GetRedirectAsync(redirectVM.Id);
+            //var redirect = await _redirectService.GetAsync(redirectVM.Id);
             //redirectVM.CopyPropsTo(ref redirect);
-            await _redirectService.UpdateRedirectAsync(redirectVM.Id, redirectVM);
+            await _redirectService.UpdateAsync(redirectVM.Id, redirectVM);
         }
 
         // POST: Redirects/Delete/5
@@ -155,7 +155,7 @@ namespace CS_UrlRedirect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _redirectService.DeleteRedirectAsync(id);
+            await _redirectService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }
