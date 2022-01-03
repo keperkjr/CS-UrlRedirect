@@ -162,5 +162,16 @@ namespace CS_UrlRedirect.Controllers
         {
             return _context.Redirects.FirstOrDefault(e => e.Id == id);
         }
+
+        // POST: Redirects/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var redirect = GetRedirect(id);
+            _context.Redirects.Remove(redirect);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

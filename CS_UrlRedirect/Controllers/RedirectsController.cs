@@ -10,6 +10,7 @@ using CS_UrlRedirect.Models;
 
 namespace CS_UrlRedirect.Controllers
 {
+    [Route("r")]
     public class RedirectsController : Controller
     {
         private readonly DatabaseDBContext _context;
