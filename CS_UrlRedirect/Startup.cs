@@ -71,6 +71,12 @@ namespace CS_UrlRedirect
 
             app.UseEndpoints(endpoints =>
             {
+                //Actions only for Home controller (domain.com/about instead of domain.com/home/about)
+                endpoints.MapControllerRoute(
+                      name: "HomeActionOnly",
+                      pattern: "{action}/{id?}",
+                      defaults: new { controller = "Home", action = "Index" });
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
